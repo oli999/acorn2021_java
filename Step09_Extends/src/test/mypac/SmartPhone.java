@@ -1,6 +1,12 @@
 package test.mypac;
 
-public class SmartPhone extends HandPhone{
+// SmartPhone 클래스를 종단 클래스로 만드는 final 예약어 
+public final class SmartPhone extends HandPhone{
+	//디폴트 생성자
+	public SmartPhone() {
+		System.out.println("SmartPhone() 생성자 호출됨");
+	}
+	
 	//인터냇 하는 메소드
 	public void doInternet() {
 		System.out.println("인터냇을 해요");
