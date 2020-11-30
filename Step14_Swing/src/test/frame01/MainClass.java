@@ -41,6 +41,25 @@ public class MainClass {
 		};
 		//버튼에 액션 리스너 등록하기 
 		btn.addActionListener( listener );
+		
+		//버튼객체 생성해서 
+		JButton btn2=new JButton("merong");
+		//위치와 크기를 설정하고 
+		btn2.setBounds(200, 50, 100, 40);
+		//프레임에 추가 하기 
+		f.add(btn2);
+		/*
+		btn2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(f, "약올리지마!");
+			}
+		});
+		*/
+		//람다식을 활용하면 아래와 같다 
+		btn2.addActionListener((e)->{
+			JOptionPane.showMessageDialog(f, "약올리지마!");
+		});
 	}
 }
 
