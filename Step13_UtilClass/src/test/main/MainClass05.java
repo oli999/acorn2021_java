@@ -23,7 +23,7 @@ public class MainClass05 {
 		//키보드로 부터 문자열을 입력 받기 위해 생성한 객체 (금수저)
 		Scanner scan=new Scanner(System.in);
 		//5 번 반복을 수행할 for 문 구성
-		for(int i=0; i<500 ; i++) {
+		for(int i=0; i<5 ; i++) {
 			System.out.println("친구 이름 입력:");
 			String line=scan.nextLine();
 			names.add(line);
@@ -33,6 +33,10 @@ public class MainClass05 {
 			//i 번째 저장된 아이템을 읽어와서 
 			String tmp=names.get(i);
 			System.out.println(i+" 번째 친구 이름 : "+tmp);
+		}
+		System.out.println("----------------");
+		for(String tmp:names) {
+			System.out.println("친구 이름 : "+tmp);
 		}
 	}
 }
