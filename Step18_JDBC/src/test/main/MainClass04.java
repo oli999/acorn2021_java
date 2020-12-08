@@ -4,12 +4,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
-public class MainClass03 {
+/*
+ *  member 테이블에서 
+ * 
+ *  num 이 804 번인 회원의 
+ *  
+ *  addr 을 노량진으로 수정하는 코드를 작성해 보세요.
+ *   
+ */
+public class MainClass04 {
 	public static void main(String[] args) {
-		//아래의 정보를 member  테이블에 저장하고자 한다.
-		String name="톰캣";
-		String addr="건물 옥상";
-		
+		int num=804;
+		String addr="노량진";
 		//DB 연결 객체를 담을 지역변수
 		Connection conn=null;
 		try {
@@ -29,17 +35,18 @@ public class MainClass03 {
 		PreparedStatement pstmt=null;
 		int flag=0;
 		try {
-			//미완성의 insert 문 
-			String sql="INSERT INTO member"
-					+ " (num, name, addr)"
-					+ " VALUES(member_seq.NEXTVAL, ?, ?)";
+			//미완성의 update 문   
+			String sql="UPDATE member "
+					+ " SET addr=?"
+					+ " WHERE num=?";
 			pstmt=conn.prepareStatement(sql);
-			// ? 에 순서대로 값을 바인딩 하기 
-			pstmt.setString(1, name);
-			pstmt.setString(2, addr);
+			// ? 에 순서대로 값을 바인딩 하기
+			// 바인딩 => binding => 연결하기 => 붙이기 => ??? 
+			pstmt.setString(1, addr);
+			pstmt.setInt(2, num);
 			//완성된 sql 문을 수행하고 변화된 row 의 갯수를 리턴 받는다.
 			flag=pstmt.executeUpdate();
-			System.out.println("회원 정보를 저장 했습니다.");
+			System.out.println("회원 정보를 수정 했습니다.");
 		}catch(Exception e) {
 			e.printStackTrace();
 		}finally {
@@ -49,16 +56,9 @@ public class MainClass03 {
 			}catch(Exception e) {}
 		}
 		if(flag>0) {
-			System.out.println("작업(INSERT) 성공");
+			System.out.println("작업(UPDATE) 성공");
 		}else {
-			System.out.println("작업(INSERT) 실패");
-		}
+			System.out.println("작업(UPDATE) 실패");
+		}		
 	}
-}
-
-
-
-
-
-
-
+}	
