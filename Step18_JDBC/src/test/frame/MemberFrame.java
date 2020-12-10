@@ -81,16 +81,19 @@ public class MemberFrame extends JFrame implements ActionListener{
 		
 		//삭제 버튼을 상단 페널에 추가
 		topPanel.add(btn_delete);
+		//회원목록을 주기적으로 업데이트 해주는 스레드 시작 시키기 
+		new UpdateThread().start();
 	}
 	
 	//회원 목록을 테이블에 출력하는 메소드
 	public void printMember() {
-		//기존에 출력된 내용 초기화
-		model.setRowCount(0); // 0 개의 row 로 강제로 초기화 하고 
 		
 		//회원 목록 불러오기
 		MemberDao dao=new MemberDao();
 		List<MemberDto> list=dao.selectAll();
+		//기존에 출력된 내용 초기화
+		model.setRowCount(0); // 0 개의 row 로 강제로 초기화 하고 
+				
 		for(MemberDto tmp:list) {
 			// {1, "김구라", "노량진" }
 			//Object[] row= {tmp.getNum(), tmp.getName(), tmp.getAddr()};
@@ -154,6 +157,25 @@ public class MemberFrame extends JFrame implements ActionListener{
 			JOptionPane.showMessageDialog(this, "추가 실패!");
 		}
 	}
+	//화면을 주기적으로 update 해주는 스레드
+	class UpdateThread extends Thread{
+		@Override
+		public void run() {
+			// 바깥에 싸고 있는 클래스의 멤버 메소드 printMember() 메소드를 
+			// 5초마다 한번씩 주기적으로 호출하기
+			while(true) {//무한 루프
+				try {
+					//5초 잠자다가
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				//화면 업데이트
+				printMember();
+			}
+		}
+	}
+	
 }
 
 
