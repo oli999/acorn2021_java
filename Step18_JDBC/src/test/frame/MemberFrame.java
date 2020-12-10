@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
 
@@ -20,7 +22,8 @@ import javax.swing.table.DefaultTableModel;
 import test.member.dao.MemberDao;
 import test.member.dto.MemberDto;
 
-public class MemberFrame extends JFrame implements ActionListener{
+public class MemberFrame extends JFrame 
+				implements ActionListener, PropertyChangeListener{
 	//필드 
 	JTextField text_name,  text_addr;
 	DefaultTableModel model;
@@ -62,7 +65,13 @@ public class MemberFrame extends JFrame implements ActionListener{
 		model=new DefaultTableModel(colNames, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				return false;
+				System.out.println(row+"|"+column);
+				//번호만 수정 불가하게 하려면 여기를 어떻게 코딩하면 될까요?
+				if(column == 0) { // 0번 째 칼럼은
+					return false;//수정 불가 하게 
+				}else {//나머지 칼럼은 
+					return true;//수정 가능하게
+				}
 			}
 		};
 		//모델을 테이블에 연결하기
@@ -82,8 +91,11 @@ public class MemberFrame extends JFrame implements ActionListener{
 		//삭제 버튼을 상단 페널에 추가
 		topPanel.add(btn_delete);
 		//회원목록을 주기적으로 업데이트 해주는 스레드 시작 시키기 
-		new UpdateThread().start();
-	}
+		//new UpdateThread().start();
+		
+		//테이블의 값이 바뀌는지 감시할 리스너 등록하기 
+		table.addPropertyChangeListener(this);
+	}//생성자
 	
 	//회원 목록을 테이블에 출력하는 메소드
 	public void printMember() {
@@ -183,6 +195,28 @@ public class MemberFrame extends JFrame implements ActionListener{
 				//화면 업데이트
 				printMember();
 			}
+		}
+	}
+	//table 칼럼이 수정중인지 여부 
+	boolean isEditing=false;
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		System.out.println("change!");
+		System.out.println(evt.getPropertyName());
+		//만일 table 칼럼에서 발생한 이벤트라면
+		if(evt.getPropertyName().equals("tableCellEditor")) {
+			if(isEditing) {
+				//수정된 row 를 읽어와서 DB 에 반영한다.
+				int selectedIndex=table.getSelectedRow();
+				int num=(int)model.getValueAt(selectedIndex, 0);
+				String name=(String)model.getValueAt(selectedIndex, 1);
+				String addr=(String)model.getValueAt(selectedIndex, 2);
+				MemberDto dto=new MemberDto(num, name, addr);
+				new MemberDao().update(dto);
+			}
+			//isEditing 의 값을 반대로 바꿔준다. true => false, false => true
+			isEditing=!isEditing;
 		}
 	}
 	
