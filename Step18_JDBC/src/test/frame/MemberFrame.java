@@ -50,7 +50,13 @@ public class MemberFrame extends JFrame implements ActionListener{
 		//눌러진 버튼의 action command 를 읽어온다.
 		String command=e.getActionCommand();
 		if(command.equals("add")) { //추가 버튼을 눌렀을때
+			//1. 입력한 이름과 주소를 읽어와서
 			
+			//2. MemberDto 객체에 담고
+			
+			//3. MemberDao 객체를 이용해서 DB 에 저장
+			
+			//실제 저장되었는지 확인해 보세요.
 		}
 	}
 }
