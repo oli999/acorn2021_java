@@ -24,6 +24,7 @@ public class MemberFrame extends JFrame implements ActionListener{
 	//필드 
 	JTextField text_name,  text_addr;
 	DefaultTableModel model;
+	JTable table;
 	
 	//생성자
 	public MemberFrame(String title) {
@@ -54,11 +55,16 @@ public class MemberFrame extends JFrame implements ActionListener{
 		btn_add.addActionListener(this);
 		
 		//회원 목록을 출력할 테이블
-		JTable table=new JTable();
+		table=new JTable();
 		//칼럼명을 String[] 에 순서대로 준비하기
 		String[] colNames= {"번호","이름","주소"};
 		//테이블에 연결할 기본 모델 객체
-		model=new DefaultTableModel(colNames, 0);
+		model=new DefaultTableModel(colNames, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		//모델을 테이블에 연결하기
 		table.setModel(model);
 		//테이블의 내용이 scroll 될수 있도록 스크롤 페널로 감싼다.
@@ -67,10 +73,21 @@ public class MemberFrame extends JFrame implements ActionListener{
 		add(scPane, BorderLayout.CENTER);
 		//회원 목록을 테이블에 출력하기
 		printMember();
+		
+		//삭제 버튼을 만들고 
+		JButton btn_delete=new JButton("삭제");
+		btn_delete.addActionListener(this);
+		btn_delete.setActionCommand("delete");
+		
+		//삭제 버튼을 상단 페널에 추가
+		topPanel.add(btn_delete);
 	}
 	
 	//회원 목록을 테이블에 출력하는 메소드
 	public void printMember() {
+		//기존에 출력된 내용 초기화
+		model.setRowCount(0); // 0 개의 row 로 강제로 초기화 하고 
+		
 		//회원 목록 불러오기
 		MemberDao dao=new MemberDao();
 		List<MemberDto> list=dao.selectAll();
@@ -99,12 +116,23 @@ public class MemberFrame extends JFrame implements ActionListener{
 		String command=e.getActionCommand();
 		if(command.equals("add")) { //추가 버튼을 눌렀을때
 			addMember();
+		}else if(command.equals("delete")) {//삭제 버튼을 눌렀을때
+			//선택된 row 의 인덱스를 읽어온다.
+			int selectedIndex=table.getSelectedRow();
+			if(selectedIndex == -1) {
+				JOptionPane.showMessageDialog(this,"삭제할 row 를 선택해라");
+				return;//메소드를 여기서 끝내라 
+			}
+			//선택한 row 의 0 번 칼럼의 값(번호)을 읽어와서 int 로 casting 하기 
+			int num=(int)table.getValueAt(selectedIndex, 0);
+			//MemberDao 객체를 이용해서 삭제하기
+			new MemberDao().delete(num);
+			//UI 업데이트 (목록 다시 출력하기)
+			printMember();
 		}
 	}
 	//회원정보를 추가하는 메소드 
 	public void addMember() {
-		//기존에 출력된 내용 초기화
-		model.setRowCount(0); // 0 개의 row 로 강제로 초기화 하고 
 		
 		//1. 입력한 이름과 주소를 읽어와서
 		String name=text_name.getText();
