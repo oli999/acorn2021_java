@@ -44,7 +44,7 @@ public class MemberDao {
 			//실행할 SELECT 문 작성
 			String sql="SELECT num,name,addr"
 					+ " FROM member"
-					+ " ORDER BY num ASC";
+					+ " ORDER BY num DESC";
 			pstmt=conn.prepareStatement(sql);
 			//? 에 바인딩 할게 있으면 하고 아님 말고
 			rs=pstmt.executeQuery();

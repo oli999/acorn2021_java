@@ -23,6 +23,7 @@ import test.member.dto.MemberDto;
 public class MemberFrame extends JFrame implements ActionListener{
 	//필드 
 	JTextField text_name,  text_addr;
+	DefaultTableModel model;
 	
 	//생성자
 	public MemberFrame(String title) {
@@ -57,26 +58,34 @@ public class MemberFrame extends JFrame implements ActionListener{
 		//칼럼명을 String[] 에 순서대로 준비하기
 		String[] colNames= {"번호","이름","주소"};
 		//테이블에 연결할 기본 모델 객체
-		DefaultTableModel model=new DefaultTableModel(colNames, 0);
+		model=new DefaultTableModel(colNames, 0);
 		//모델을 테이블에 연결하기
 		table.setModel(model);
 		//테이블의 내용이 scroll 될수 있도록 스크롤 페널로 감싼다.
 		JScrollPane scPane=new JScrollPane(table);
 		//스크롤 페널을 프레임의 중앙에 배치하기
 		add(scPane, BorderLayout.CENTER);
-		//모델의 메소드 확인해 보기
-		Object[] row1= {1, "김구라", "노량진"};
-		Object[] row2={2,"해골","행신동"};
-		model.addRow(row1);
-		model.addRow(row2);
-		
-		//Vector 는 약간 무거운 ArrayList 라고 생각하고 쓰면 된다. 
-		Vector<Object> vec1=new Vector<>();
-		vec1.add(3);
-		vec1.add("원숭이");
-		vec1.add("상도동");
-		model.addRow(vec1);
+		//회원 목록을 테이블에 출력하기
+		printMember();
 	}
+	
+	//회원 목록을 테이블에 출력하는 메소드
+	public void printMember() {
+		//회원 목록 불러오기
+		MemberDao dao=new MemberDao();
+		List<MemberDto> list=dao.selectAll();
+		for(MemberDto tmp:list) {
+			// {1, "김구라", "노량진" }
+			//Object[] row= {tmp.getNum(), tmp.getName(), tmp.getAddr()};
+			Vector<Object> row=new Vector<>();
+			row.add(tmp.getNum());
+			row.add(tmp.getName());
+			row.add(tmp.getAddr());
+	
+			model.addRow(row);
+		}
+	}
+	
 	//메인 메소드
 	public static void main(String[] args) {
 		MemberFrame f=new MemberFrame("회원정보 관리");
@@ -94,6 +103,9 @@ public class MemberFrame extends JFrame implements ActionListener{
 	}
 	//회원정보를 추가하는 메소드 
 	public void addMember() {
+		//기존에 출력된 내용 초기화
+		model.setRowCount(0); // 0 개의 row 로 강제로 초기화 하고 
+		
 		//1. 입력한 이름과 주소를 읽어와서
 		String name=text_name.getText();
 		String addr=text_addr.getText();
@@ -108,6 +120,8 @@ public class MemberFrame extends JFrame implements ActionListener{
 		//실제 저장되었는지 확인해 보세요.
 		if(isSuccess) {
 			JOptionPane.showMessageDialog(this, name+" 의 정보 추가성공");
+			//테이블에 다시 목록 불러오기
+			printMember();
 		}else {
 			JOptionPane.showMessageDialog(this, "추가 실패!");
 		}
