@@ -17,7 +17,7 @@ public class DBConnect {
 			//접속하고 Connection 객체의 참조값 얻어오기
 			conn=DriverManager.getConnection(url, "acorn01", "tiger01");
 			//conn=DriverManager.getConnection(url, "scott", "tiger");
-			System.out.println("Oracle DB 접속 성공");
+			//System.out.println("Oracle DB 접속 성공");
 		}catch(Exception e) {
 			e.printStackTrace();
 		}		
