@@ -9,14 +9,14 @@ import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -59,7 +59,7 @@ public class ClientFrame extends JFrame
 		//페널을 만들어서 프레임의 위쪽에 배치하기 
 		JPanel topPanel=new JPanel();
 		topPanel.setBackground(Color.YELLOW);
-		add(topPanel, BorderLayout.NORTH);
+		add(topPanel, BorderLayout.SOUTH);
 		
 		//프레임에 UI 배치하기
 		tf=new JTextField(10);
@@ -80,6 +80,21 @@ public class ClientFrame extends JFrame
 		ta.setEditable(false);
 		//JTextField 에 KeyListener 등록하기
 		tf.addKeyListener(this);
+		
+		//참여자 목록을 출력할 준비
+		JList<String> jList=new JList<>();
+		jList.setBackground(Color.GREEN);
+		
+		JPanel rightPanel=new JPanel();
+		rightPanel.add(jList);
+		add(rightPanel, BorderLayout.EAST);
+		
+		Vector<String> enterList=new Vector<>();
+		enterList.add("참여자 목록");
+		enterList.add("김구라");
+		enterList.add("해골");
+		
+		jList.setListData(enterList);
 		
 		//소켓 접속하기 
 		connect();
@@ -143,8 +158,21 @@ public class ClientFrame extends JFrame
 				try {
 					//대기하다가 문자열이 도착하면 메소드가 리턴한다.
 					String line=br.readLine();
-					//도착된 메세지를 JTextArea 에 개행기호와 함께 추가하기
-					ta.append(line+"\r\n");
+					//JSON 문자열을 이용해서 JSONObject 객체를 생성한다.
+					JSONObject jsonObj=new JSONObject(line);
+					// 어떤 종류의 메세지 인지 읽어와 본다.
+					String type=jsonObj.getString("type");
+					if(type.equals("enter")) {
+						String name=jsonObj.getString("name");
+						ta.append("[ "+name+" ] 님이 입장했습니다.");
+						ta.append("\r\n");
+					}else if(type.equals("msg")) {
+						String name=jsonObj.getString("name");
+						String content=jsonObj.getString("content");
+						ta.append(name+" : "+content);
+						ta.append("\r\n");
+					}
+					
 					//출력할 문서의 높이
 					int height=ta.getDocument().getLength();
 					//높이 만큼 JTextArea 를 스크롤시켜서 가장 아래에 있는 문자열이 보이게
