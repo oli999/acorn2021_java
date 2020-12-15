@@ -111,8 +111,13 @@ public class ServerMain {
 						//대화명을 필드에 저장한다.
 						chatName=jsonObj.getString("name");
 						//모든 클라이언트에게 대화명 목록을 보내준다.
-						
+						sendChatNameList();
 					}
+					//클라이언트의 접속이 끈기면 
+					if(line==null) {
+						break; //반복문  while 을 탈출하도록 한다. 
+					}
+					
 					//서버가 특정 클라이언트에게 받은 문자열을 모든 클라이언트에게 보낸다.
 					sendMessage(line);
 				}
@@ -120,16 +125,25 @@ public class ServerMain {
 				e.printStackTrace();
 			}finally {
 				try {
+					//현재 스레드를 목록에서 제거하기 
+					threadList.remove(this);
+					//누가 퇴장하는지 정보를 보낸다.
+					JSONObject jsonObj=new JSONObject();
+					jsonObj.put("type", "out");
+					jsonObj.put("name", this.chatName);
+					sendMessage(jsonObj.toString());
+					//참여자 목록 업데이트 
+					sendChatNameList();
+					//socket 을 닫아준다.
 					socket.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			//현재 스레드를 목록에서 제거하기 
-			threadList.remove(this);
-		}
-	}
-}
+		}//run()
+		
+	}//class ServerThread
+}//class ServarMain
 
 
 

@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 /*
  *  - 대화방에 현재 누가 참여하고 있는지 목록 출력하기
@@ -50,6 +51,7 @@ public class ClientFrame extends JFrame
 	BufferedReader br;
 	JTextArea ta;
 	String chatName; //대화명을 저장할 필드 
+	JList<String> jList;
 	
 	//생성자
 	public ClientFrame(String title) {
@@ -82,7 +84,7 @@ public class ClientFrame extends JFrame
 		tf.addKeyListener(this);
 		
 		//참여자 목록을 출력할 준비
-		JList<String> jList=new JList<>();
+		jList=new JList<>();
 		jList.setBackground(Color.GREEN);
 		
 		JPanel rightPanel=new JPanel();
@@ -171,6 +173,28 @@ public class ClientFrame extends JFrame
 						String content=jsonObj.getString("content");
 						ta.append(name+" : "+content);
 						ta.append("\r\n");
+					}else if(type.equals("members")) {
+						// "list" 라는 키값으로 저장된 JSONArray 객체 얻어오기 
+						JSONArray jsonArr=jsonObj.getJSONArray("list");
+						//참여자 목록을 저장할 Vector
+						Vector<String> list=new Vector<>();
+						//반복문 돌면서 
+						for(int i=0; i<jsonArr.length(); i++) {
+							// JSONArray 에서 i 번째 참여자 명단을 얻어와서 
+							String tmp=jsonArr.getString(i);
+							// Vector 에 누적 시키기
+							list.add(tmp);
+						}
+						//반복문 돌고 난후 참여자 목록 Vector 를 JList 에 연결하기
+						jList.setListData(list);
+					}else if(type.equals("out")) {
+						String name=jsonObj.getString("name");
+						ta.append("# "+name+" # 님이 퇴장 했습니다.");
+						ta.append("\r\n");
+					}
+					
+					if(line==null) { //서버와의 접속이 끈기면 
+						break;// while 문 탈출
 					}
 					
 					//출력할 문서의 높이
@@ -225,7 +249,35 @@ public class ClientFrame extends JFrame
 
 
 
-
+/*
+ * 
+ *    JSON  vs  XML
+ *    
+ *    {"num":1, "name":"김구라", "addr":"노량진}
+ *    
+ *    vs
+ *    
+ *    <member>
+ *    	<num>1</num>
+ *    	<name>김구라</name>
+ *    	<addr>노량진</addr>
+ *    </member>
+ *    
+ *    ---------------------------------------
+ *    
+ *    {"num":1, "friends":["김구라","해골","원숭이"]}
+ *    
+ *    vs
+ *    
+ *    <info>
+ *    	<num>1</num>
+ *    	<friends>
+ *    		<item>김구라</item>
+ *    		<item>해골</item>
+ *    		<item>원숭이</item>
+ *    	</friends>
+ *    </info>
+ */
 
 
 
